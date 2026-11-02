@@ -28,18 +28,21 @@
 
 ## 限速档位 / Speed Bands
 
-| 相对 home 高度 | `near_ground_slowdown.lua` | `near_ground_slowdown_stage2_0p2.lua` |
-| --- | --- | --- |
-| > 5 m | 不限制（使用原始参数） | 不限制（使用原始参数） |
-| 2 m < 高度 ≤ 5 m | 0.50 m/s | 0.50 m/s |
-| 高度 ≤ 2 m | 0.10 m/s | 0.20 m/s |
-| 高度/数据故障 | 0.10 m/s | 0.10 m/s（`fault cap`） |
+| 相对 home 高度 | `near_ground_slowdown.lua` | `near_ground_slowdown_stage2_0p2.lua` | `near_ground_slowdown_smooth_10m_stage2_0p2.lua` |
+| --- | --- | --- | --- |
+| > 10 m | 不限制（使用原始参数） | 不限制（使用原始参数） | 不限制（使用原始参数） |
+| 10 m ≥ 高度 > 5 m | 不限制（使用原始参数） | 不限制（使用原始参数） | 沿 smoothstep 曲线由原始值平滑收敛到 0.50 m/s |
+| 2 m < 高度 ≤ 5 m | 0.50 m/s | 0.50 m/s | 0.50 m/s |
+| 高度 ≤ 2 m | 0.10 m/s | 0.20 m/s | 0.20 m/s |
+| 高度/数据故障 | 0.10 m/s | 0.10 m/s（`fault cap`） | 0.10 m/s（`fault cap`） |
 
 行为细节：
 
 - **收紧立即生效**，**放松需持续 500 ms 且越过 0.3 m 滞回**，避免在档位边界反复抖动。
 - 回调周期 100 ms（10 Hz）；两次回调间隔超过 500 ms 视为调度卡顿，本周期强制走保守档。
 - 高度数据不可信（EKF 不健康、home 未设置、高度无效）或参数异常时，强制最紧档并告警。
+- 10–5 m 为连续缓冲区间：`near_ground_slowdown_smooth_10m_stage2_0p2.lua` 按 `L + (R − L)·s²(3 − 2s)`（R 为原始有效速度，L = min(R, 0.50)，s 为 5–10 m 归一化高度）收敛，曲线两端斜率为 0，进入 10 m 与抵达 5 m 均无速度阶跃；另两个脚本在该区间不限制。
+- 4.6.x 的 `AP_Int16` 会截断小数 cm/s：仅 `near_ground_slowdown_smooth_10m_stage2_0p2.lua` 在写入前向下取整到整数 cm/s 并保证 ≥ 1，既不放大目标值，也不会把有效限速误写为 0。
 
 ---
 
@@ -163,6 +166,7 @@ NGSL, Height, Limit, VDown, Mode, State    (格式 fffBB)
 
 - `near_ground_slowdown.lua`：2 m 以下 0.10 m/s，接地更软，适合机体贵重、场地狭窄的场景。
 - `near_ground_slowdown_stage2_0p2.lua`：2 m 以下 0.20 m/s，最后一米更跟手，但接地冲击更大。
+- `near_ground_slowdown_smooth_10m_stage2_0p2.lua`：10 m 起沿曲线提前收速，2 m 以下 0.20 m/s；避免 5 m 处突然限速造成的掉高与飞手感突兀，并对 4.6.x 的整数 cm/s 做量化保护，适合起飞高度较高、追求降落平顺的场合。
 
 ---
 
