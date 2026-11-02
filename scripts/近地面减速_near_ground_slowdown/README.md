@@ -17,9 +17,11 @@
 | --- | --- |
 | `near_ground_slowdown.lua` | 标准版：2 m 以下限 0.10 m/s |
 | `near_ground_slowdown_stage2_0p2.lua` | 二阶段版：2 m 以下放宽到 0.20 m/s |
+| `near_ground_slowdown_smooth_10m_stage2_0p2.lua` | 10 m 缓冲渐变版：10–5 m 平滑收敛到 0.50 m/s，2 m 以下 0.20 m/s |
+| `near_ground_slowdown_smooth_10m_stage2_0p2.md` | 上述脚本的专属说明文档 |
 | `README.md` | 本说明文档 |
 
-两份脚本功能同源，**只能加载其中一份**：它们使用同一张恢复参数表（table key `192`、
+三份脚本功能同源，**只能加载其中一份**：它们使用同一张恢复参数表（table key `192`、
 魔数 `602902`、前缀 `NGC_`），同时加载会互相覆盖恢复记录并争夺控制权。
 
 ---
