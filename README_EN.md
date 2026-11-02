@@ -27,6 +27,8 @@ The repository contains only scripts that can be copied directly into the `APM/s
     └── 近地面减速_near_ground_slowdown
         ├── near_ground_slowdown.lua
         ├── near_ground_slowdown_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.md
         └── README.md
 ```
 
@@ -36,13 +38,14 @@ The repository contains only scripts that can be copied directly into the `APM/s
 | --- | --- | --- |
 | `near_ground_slowdown.lua` | ArduCopter 4.6.3 / 4.7.0 | In AltHold / Loiter, limits manual descent speed by height above the home point: 0.50 m/s between 2 m and 5 m, 0.10 m/s at or below 2 m |
 | `near_ground_slowdown_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | Same as above, but the ≤ 2 m band is relaxed to 0.20 m/s |
+| `near_ground_slowdown_smooth_10m_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | Same as above, plus a smooth 10–5 m buffer (curve converging from the original value to 0.50 m/s) and integer cm/s quantization for 4.6.x |
 
 Parameter definitions, state codes and log fields for each script are documented in the `README.md` of the corresponding function directory.
 
 ## Usage Notes
 
 - Copy the script into the `APM/scripts/` directory on the flight controller SD card and verify that `SCR_ENABLE = 1`.
-- Load only one script per function; the two `near_ground_slowdown` variants share the `NGC_` parameter table and must not be loaded simultaneously.
+- Load only one script per function; the three `near_ground_slowdown` variants share the `NGC_` parameter table and must not be loaded simultaneously.
 - The scripts write descent-speed parameters only and never send arm / disarm / motor / mode commands; landing relies on the native `DISARM_DELAY` automatic disarm.
 - Height is derived from the EKF position relative to the home point, not from true height above ground; terrain relief and barometric drift affect the decision.
 - For first use, remove the propellers and verify parameter recording and restoration on the ground before flying.

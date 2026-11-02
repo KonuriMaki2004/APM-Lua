@@ -27,6 +27,8 @@ Le dépôt ne contient que des scripts pouvant être copiés directement dans le
     └── 近地面减速_near_ground_slowdown
         ├── near_ground_slowdown.lua
         ├── near_ground_slowdown_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.md
         └── README.md
 ```
 
@@ -36,13 +38,14 @@ Le dépôt ne contient que des scripts pouvant être copiés directement dans le
 | --- | --- | --- |
 | `near_ground_slowdown.lua` | ArduCopter 4.6.3 / 4.7.0 | En modes AltHold / Loiter, limite la vitesse de descente manuelle selon la hauteur au-dessus du point home : 0,50 m/s entre 2 m et 5 m, 0,10 m/s à 2 m ou moins |
 | `near_ground_slowdown_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | Identique ci-dessus, mais le palier ≤ 2 m est porté à 0,20 m/s |
+| `near_ground_slowdown_smooth_10m_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | Identique ci-dessus, avec en plus un tampon progressif de 10 à 5 m (courbe convergeant de la valeur d'origine vers 0,50 m/s) et une quantification en cm/s entiers pour la 4.6.x |
 
 La définition des paramètres, les codes d'état et les champs de journal de chaque script sont documentés dans le `README.md` du répertoire fonctionnel correspondant.
 
 ## Notes d'utilisation
 
 - Copier le script dans le répertoire `APM/scripts/` de la carte SD du contrôleur de vol et vérifier que `SCR_ENABLE = 1`.
-- Ne charger qu'un seul script par fonction ; les deux variantes `near_ground_slowdown` partagent la table de paramètres `NGC_` et ne doivent pas être chargées simultanément.
+- Ne charger qu'un seul script par fonction ; les trois variantes `near_ground_slowdown` partagent la table de paramètres `NGC_` et ne doivent pas être chargées simultanément.
 - Les scripts n'écrivent que les paramètres de vitesse de descente et n'envoient aucune commande d'armement / désarmement / moteur / mode ; l'atterrissage repose sur le désarmement automatique natif `DISARM_DELAY`.
 - La hauteur provient de la position EKF relative au point home, et non de la hauteur réelle au-dessus du sol ; le relief et la dérive barométrique influencent la décision.
 - Lors de la première utilisation, retirer les hélices et vérifier au sol l'enregistrement et la restauration des paramètres avant tout vol.

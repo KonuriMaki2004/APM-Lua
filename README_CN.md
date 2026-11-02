@@ -27,6 +27,8 @@
     └── 近地面减速_near_ground_slowdown
         ├── near_ground_slowdown.lua
         ├── near_ground_slowdown_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.lua
+        ├── near_ground_slowdown_smooth_10m_stage2_0p2.md
         └── README.md
 ```
 
@@ -36,13 +38,14 @@
 | --- | --- | --- |
 | `near_ground_slowdown.lua` | ArduCopter 4.6.3 / 4.7.0 | 在 AltHold / Loiter 模式下按相对 home 点高度限制手动下降速度：2 m–5 m 限 0.50 m/s，≤ 2 m 限 0.10 m/s |
 | `near_ground_slowdown_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | 同上，但 ≤ 2 m 档放宽至 0.20 m/s |
+| `near_ground_slowdown_smooth_10m_stage2_0p2.lua` | ArduCopter 4.6.3 / 4.7.0 | 同上，另有 10–5 m 平滑缓冲（曲线由原始值收敛到 0.50 m/s），并对 4.6.x 整数 cm/s 做量化 |
 
 各脚本的参数定义、状态码与日志字段，详见对应功能目录下的 `README.md`。
 
 ## 使用须知
 
 - 将脚本复制到飞控 SD 卡 `APM/scripts/` 目录，并确认 `SCR_ENABLE = 1`。
-- 同一功能只加载一份脚本；`near_ground_slowdown` 的两个变体共用 `NGC_` 参数表，不可同时加载。
+- 同一功能只加载一份脚本；`near_ground_slowdown` 的三个变体共用 `NGC_` 参数表，不可同时加载。
 - 脚本只写入下降速度参数，不发送 arm / disarm / 电机 / 模式指令；落地依赖固件原生 `DISARM_DELAY` 自动上锁。
 - 高度取自 EKF 相对 home 点的位置，不是对地真实高度；地形起伏与气压漂移会影响判定。
 - 首次使用请拆桨在地面验证参数记录与还原行为，再进行实飞。
